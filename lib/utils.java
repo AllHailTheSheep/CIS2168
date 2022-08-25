@@ -92,11 +92,11 @@ public class utils {
      * Set this parameter to false or exclude it to avoid this.
      * This function should only be used for getting user input from a Scanner initialized from System.in.
      * @param prompt The prompt to be presented to the user.
-     * @param expected_input ArrayList<String> that contains the acceptable inputs.
+     * @param expected_input An ArrayList<String> that contains the acceptable inputs.
      * @param in The pre-initialized Scanner object to read from.
      * @return String The validated string that the user inputted.
      */
-    public static String get_validated_input(String prompt, ArrayList<String> expected_input, Scanner in) {
+    public static String get_input(String prompt, ArrayList<String> expected_input, Scanner in) {
         System.out.print(prompt);
         String result;
         try {
@@ -107,12 +107,12 @@ public class utils {
             } else {
                 System.out.println("That didn't work, are you sure you entered a string?");
             }
-            result = get_validated_input(prompt, expected_input, in);
+            result = get_input(prompt, expected_input, in);
         }
         if (expected_input.contains(result)) {
             return result;
         } else {
-            result = get_validated_input(prompt, expected_input, in);
+            result = get_input(prompt, expected_input, in);
         }
         return result;
     }
@@ -124,13 +124,13 @@ public class utils {
      * If the parameter "print" is set to true, it will print the accepted inputs.
      * Set this parameter to false or exclude it to avoid this.
      * This function should only be used for getting user input from a Scanner initialized from System.in.
-     * @param prompt
-     * @param expected_input
-     * @param in
-     * @param print
+     * @param prompt The prompt to be presented to the user.
+     * @param expected_input An ArrayList<String> that contains the acceptable inputs.
+     * @param in The pre-initialized Scanner object to read from.
+     * @param print Boolean to control the printing of expected inputs.
      * @return String
      */
-    public static String get_validated_input(String prompt, ArrayList<String> expected_input, Scanner in, boolean print) {
+    public static String get_input(String prompt, ArrayList<String> expected_input, Scanner in, boolean print) {
         System.out.print(prompt);
         if (print) {
             System.out.println("Expected inputs: " + expected_input.toString());
@@ -144,15 +144,165 @@ public class utils {
             } else {
                 System.out.println("That didn't work, are you sure you entered a string?");
             }
-            result = get_validated_input(prompt, expected_input, in, print);
+            result = get_input(prompt, expected_input, in, print);
         }
         if (expected_input.contains(result)) {
             return result;
         } else {
-            result = get_validated_input(prompt, expected_input, in, print);
+            result = get_input(prompt, expected_input, in, print);
         }
         return result;
     }
+
+
+    
+    /** 
+     * This function validates and returns a integer that the user inputted.
+     * It will re-run if the input cannot be parsed.
+     * If the parameter "print" is set to true, it will print the accepted inputs.
+     * Set this parameter to false or exclude it to avoid this.
+     * This function should only be used for getting user input from a Scanner initialized from System.in.
+     * @param prompt The prompt to be presented to the user.
+     * @param expected_input An ArrayList<Integer> containing the acceptable inputs.
+     * @param in The pre-initialized Scanner object to read from.
+     * @return int The validated integer from the user.
+     */
+    public int get_int_input(String prompt, ArrayList<Integer> expected_input, Scanner in) {
+        System.out.print(prompt);
+        int result;
+        try {
+            result = in.nextInt();
+        } catch (Exception e) {
+            if (DEBUG) {
+                System.out.println(e);
+            } else {
+                System.out.println("That didn't work, are you sure you entered an integer?");
+            }
+            result = get_int_input(prompt, expected_input, in);
+        }
+        if (expected_input.contains(result)) {
+            return result;
+        } else {
+            get_int_input(prompt, expected_input, in);
+        }
+        return result;
+    }
+
+    
+    /** 
+     * This function validates and returns a integer that the user inputted.
+     * It will re-run if the input cannot be parsed.
+     * If the parameter "print" is set to true, it will print the accepted inputs.
+     * Set this parameter to false or exclude it to avoid this.
+     * This function should only be used for getting user input from a Scanner initialized from System.in.
+     * @param prompt The prompt to be presented to the user.
+     * @param expected_input An ArrayList<Integer> containing the acceptable inputs.
+     * @param in The pre-initialized Scanner object to read from.
+     * @param print Boolean to control the printing of the expected values.
+     * @return int
+     */
+    public int get_int_input(String prompt, ArrayList<Integer> expected_input, Scanner in, boolean print) {
+        System.out.print(prompt);
+        if (print) {
+            System.out.println("Expected inputs: " + expected_input.toString());
+        }
+        int result;
+        try {
+            result = in.nextInt();
+        } catch (Exception e) {
+            if (DEBUG) {
+                System.out.println(e);
+            } else {
+                System.out.println("That didn't work, are you sure you entered an integer?");
+            }
+            result = get_int_input(prompt, expected_input, in);
+        }
+        if (expected_input.contains(result)) {
+            return result;
+        } else {
+            get_int_input(prompt, expected_input, in);
+        }
+        return result;
+    }
+
+    
+    /**
+     * This function validates and returns a integer that the user inputted.
+     * It will re-run if the input cannot be parsed.
+     * If the parameter "print" is set to true, it will print the accepted inputs.
+     * Set this parameter to false or exclude it to avoid this.
+     * This function should only be used for getting user input from a Scanner initialized from System.in.
+     * @param prompt The prompt to be presented to the user.
+     * @param low The lower boundary (inclusive)
+     * @param high The higher boundary (inclusive)
+     * @param in The pre-initialized Scanner object to read from.
+     * @return int The validated integer from the user.
+     */
+    public int get_int_input(String prompt, int low, int high, Scanner in) {
+        if (low > high) {
+            int temp = low;
+            low = high;
+            high = temp;
+        }
+        System.out.print(prompt);
+        int result;
+        try {
+            result = in.nextInt();
+        } catch (Exception e) {
+            if (DEBUG) {
+                System.out.println(e);
+            } else {
+                System.out.println("That didn't work, are you sure you entered an integer?");
+            }
+            result = get_int_input(prompt, low, high, in);
+        }
+        if (low <= result && result <= high) {
+            return result;
+        } else {
+            get_int_input(prompt, low, high, in);
+        }
+        return result;
+    }
+
+    
+    /** 
+     * @param prompt
+     * @param low
+     * @param high
+     * @param in
+     * @param print
+     * @return int
+     */
+    public int get_int_input(String prompt, int low, int high, Scanner in, boolean print) {
+        if (low > high) {
+            int temp = low;
+            low = high;
+            high = temp;
+        }
+        if (print) {
+            System.out.println("Expected input should be between " + low + " and " + high + ".");
+        }
+        System.out.print(prompt);
+        int result;
+        try {
+            result = in.nextInt();
+        } catch (Exception e) {
+            if (DEBUG) {
+                System.out.println(e);
+            } else {
+                System.out.println("That didn't work, are you sure you entered an integer?");
+            }
+            result = get_int_input(prompt, low, high, in);
+        }
+        if (low <= result && result <= high) {
+            return result;
+        } else {
+            get_int_input(prompt, low, high, in);
+        }
+        return result;
+    }
+
+
 
 
     // string manipulation functions
