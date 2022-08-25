@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class utils {
     // set this to see detailed error messages on misinput
-    static final boolean DEBUG = true;
+    private static final boolean DEBUG = true;
 
     
     // input functions
@@ -109,7 +109,7 @@ public class utils {
             }
             result = get_input(prompt, expected_input, in);
         }
-        if (expected_input.contains(result)) {
+        if (expected_input.contains(result.toLowerCase())) {
             return result;
         } else {
             result = get_input(prompt, expected_input, in);
@@ -146,7 +146,7 @@ public class utils {
             }
             result = get_input(prompt, expected_input, in, print);
         }
-        if (expected_input.contains(result)) {
+        if (expected_input.contains(result.toLowerCase())) {
             return result;
         } else {
             result = get_input(prompt, expected_input, in, print);
@@ -167,7 +167,7 @@ public class utils {
      * @param in The pre-initialized Scanner object to read from.
      * @return int The validated integer from the user.
      */
-    public int get_int_input(String prompt, ArrayList<Integer> expected_input, Scanner in) {
+    public static int get_int_input(String prompt, ArrayList<Integer> expected_input, Scanner in) {
         System.out.print(prompt);
         int result;
         try {
@@ -201,7 +201,7 @@ public class utils {
      * @param print Boolean to control the printing of the expected values.
      * @return int
      */
-    public int get_int_input(String prompt, ArrayList<Integer> expected_input, Scanner in, boolean print) {
+    public static int get_int_input(String prompt, ArrayList<Integer> expected_input, Scanner in, boolean print) {
         System.out.print(prompt);
         if (print) {
             System.out.println("Expected inputs: " + expected_input.toString());
@@ -238,12 +238,7 @@ public class utils {
      * @param in The pre-initialized Scanner object to read from.
      * @return int The validated integer from the user.
      */
-    public int get_int_input(String prompt, int low, int high, Scanner in) {
-        if (low > high) {
-            int temp = low;
-            low = high;
-            high = temp;
-        }
+    public static int get_int_input(String prompt, int low, int high, Scanner in) {
         System.out.print(prompt);
         int result;
         try {
@@ -266,19 +261,19 @@ public class utils {
 
     
     /** 
-     * @param prompt
-     * @param low
-     * @param high
-     * @param in
-     * @param print
+     * This function validates and returns a integer that the user inputted.
+     * It will re-run if the input cannot be parsed.
+     * If the parameter "print" is set to true, it will print the accepted inputs.
+     * Set this parameter to false or exclude it to avoid this.
+     * This function should only be used for getting user input from a Scanner initialized from System.in.
+     * @param prompt The prompt to be presented to the user.
+     * @param low The lower bound (inclusive)
+     * @param high The higher bound (inclusive)
+     * @param in The pre-initialized Scanner object to read from.
+     * @param print Boolean controlling the printing of the accepted inputs
      * @return int
      */
-    public int get_int_input(String prompt, int low, int high, Scanner in, boolean print) {
-        if (low > high) {
-            int temp = low;
-            low = high;
-            high = temp;
-        }
+    public static int get_int_input(String prompt, int low, int high, Scanner in, boolean print) {
         if (print) {
             System.out.println("Expected input should be between " + low + " and " + high + ".");
         }
@@ -292,17 +287,15 @@ public class utils {
             } else {
                 System.out.println("That didn't work, are you sure you entered an integer?");
             }
-            result = get_int_input(prompt, low, high, in);
+            result = get_int_input(prompt, low, high, in, print);
         }
-        if (low <= result && result <= high) {
+        if (result >= low && result <= high) {
             return result;
         } else {
-            get_int_input(prompt, low, high, in);
+            get_int_input(prompt, low, high, in, print);
         }
         return result;
     }
-
-
 
 
     // string manipulation functions

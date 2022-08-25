@@ -23,7 +23,7 @@ public class DecisionTreeTools{
         for (BankObject account : this.training){
             total += account.toDouble(account.getAge());
         }
-        return total/this.testing.size();
+        return total/this.training.size();
     }
     
     public double getAvgAgeTesting(){
@@ -31,7 +31,7 @@ public class DecisionTreeTools{
         for (BankObject account : this.testing){
             total += account.toDouble(account.getAge());
         }
-        return total/this.training.size();
+        return total/this.testing.size();
     }
     
     public double getAvgBalanceTraining(){
@@ -41,7 +41,7 @@ public class DecisionTreeTools{
             total += account.getBalance();
         }
         
-        return total/this.testing.size();
+        return total/this.training.size();
     }
     
     public double getAvgBalanceTesting(){
@@ -51,7 +51,7 @@ public class DecisionTreeTools{
             total += account.getBalance();
         }
         
-        return total/this.training.size();
+        return total/this.testing.size();
     }
     
     public double getDefaultedEntropyTraining(){
@@ -62,7 +62,7 @@ public class DecisionTreeTools{
                 
             }
         }
-        return ((double)count/this.testing.size());
+        return ((double)count/this.training.size());
     }
     
     public double getDefaultedEntropyTesting(){
@@ -73,7 +73,7 @@ public class DecisionTreeTools{
             }
         }
         
-        return (double)count/this.training.size();
+        return (double)count/this.testing.size();
     }
     
     public double getHousingEntropyTraining(){
@@ -83,7 +83,7 @@ public class DecisionTreeTools{
                 count += 1;
             }
         }
-        return (double)count/this.testing.size();
+        return (double)count/this.training.size();
     }
     
     public double getHousingEntropyTesting(){
@@ -93,7 +93,7 @@ public class DecisionTreeTools{
                 count += 1;
             }
         }
-                return (double) count/this.training.size();
+                return (double) count/this.testing.size();
     }
     
     public double getLoanEntropyTraining(){
@@ -106,7 +106,7 @@ public class DecisionTreeTools{
         }
         
         
-        return (double) count/this.testing.size();
+        return (double) count/this.training.size();
     }
     
     public double getLoanEntropyTesting(){
@@ -118,7 +118,7 @@ public class DecisionTreeTools{
             }
         }
         
-        return (double) count/this.training.size();
+        return (double) count/this.testing.size();
     }
     
     public int getTrainingSize(){

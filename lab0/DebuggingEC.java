@@ -9,7 +9,6 @@ import java.util.Random;
 import java.util.Scanner;
 
 
-
 /**
  *
  * @author Kevin Jang
@@ -80,8 +79,9 @@ public class DebuggingEC {
         for(int k = 0; k < randomSize; k++){
             int randomIndex = randomSelector.nextInt(bankObjectListTraining.size());
             BankObject tempHolder = bankObjectListTraining.get(randomIndex);
-            bankObjectListTraining.remove(randomIndex);
             bankObjectListTesting.add(tempHolder);
+            bankObjectListTraining.remove(randomIndex);
+            
             
             
         }

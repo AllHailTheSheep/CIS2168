@@ -1,7 +1,6 @@
 package lab0;
 
 import java.util.List;
-import lib.utils;
 import java.util.Scanner;
 
 /**
@@ -22,13 +21,9 @@ public class BankObject {
    
     
     BankObject(List data){
-        Scanner in = new Scanner(System.in);
         try{
             if(data.size() == 9){
                 this.age = Integer.parseInt(data.get(0).toString());
-                if (0 > this.age || this.age > 122)  { // 122 was the oldest person ever
-                    this.age = utils.get_int_input("Please enter your age", in);
-                }
                 this.job = data.get(1).toString();
                 this.marriageStatus = data.get(2).toString();
                 this.education = data.get(3).toString();
