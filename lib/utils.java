@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class utils {
+    // TODO: recursion is probably not the way to handle this. use a while loop instead.
     // set this to see detailed error messages on misinput
     private static final boolean DEBUG = true;
 
