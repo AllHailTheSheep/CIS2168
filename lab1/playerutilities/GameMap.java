@@ -14,8 +14,9 @@ public class GameMap {
 
     public void submitLookData(Coordinate pos, LookData data) {
         // TODO: make this fucntion load data into the map
-        System.out.println(pos.toString());
-        System.out.println(data.toString());
+        System.out.println(data.keySet());
+        // System.out.println(pos.toString());
+        // System.out.println(data.toString());
     }
 
     private void initializeGrid() {

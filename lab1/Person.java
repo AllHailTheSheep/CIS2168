@@ -26,9 +26,10 @@ public class Person extends Creature {
   int decideMove() {
     // TODO: choose moves based off of game map
     LookData movesLookData = new LookData(this);
+    System.out.println(movesLookData.toString());
     GM.submitLookData(POSITION, movesLookData);
     int move = utils.get_int_input("Choose your direction: ", 0, 8, new Scanner(System.in));
-    System.out.println(GM.toString());
+    // System.out.println(GM.toString());
 		return move;
   }
   
