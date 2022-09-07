@@ -1,6 +1,5 @@
 package lab1.playerutilities;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -13,6 +12,10 @@ public class LookData extends HashMap<Integer, Integer[]> {
     // ideally id define the data getting operation here but we would not be able to access look() or distance()
     public LookData(Person person) {
         data = person.lookAround(Person.DIRECTIONS_LIST);
+    }
+
+    public Integer[] getData(int dir) {
+        return data.get(dir);
     }
 
     // Question for the Professor: why do I have to Override this here for LookDataObject.keySet() to work?
@@ -28,8 +31,8 @@ public class LookData extends HashMap<Integer, Integer[]> {
         StringBuffer sb = new StringBuffer();
         for (Integer direction : data.keySet()) {
             Integer[] info = data.get(direction);
-            sb.append("Direction: " + Person.DIRECTIONS_MAP.get(direction) + ", ");
-            sb.append("Object: " + Person.OBJECT_MAP.get(info[0]) + ", ");
+            sb.append("Direction: " + Person.DIRECTIONS_MAP.get(direction) + ",\n");
+            sb.append("Object: " + Person.OBJECT_MAP.get(info[0]) + ",\n");
             sb.append("Distance: " + info[1] + "\n");
         }
         return sb.toString();

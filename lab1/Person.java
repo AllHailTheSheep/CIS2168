@@ -1,35 +1,51 @@
 package lab1;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import lab1.playerutilities.Coordinate;
 import lab1.playerutilities.GameMap;
 import lab1.playerutilities.LookData;
-import lib.utils;
 
 public class Person extends Creature {
+  private static final Logger LOG = LogManager.getLogger(GameMap.class);
   public static HashMap<Integer, String> OBJECT_MAP = new HashMap<Integer, String>();
   public static HashMap<Integer, String> DIRECTIONS_MAP = new HashMap<Integer, String>();
   public static ArrayList<Integer> DIRECTIONS_LIST;
-  public static Coordinate POSITION;
-  private static GameMap GM = new GameMap();
+  private static GameMap GM = null;
+  private static Integer moves = null;
+  private static int TOTAL_MOVES = 0;
 
   public Person(Model model, int row, int column) {
     super(model, row, column);
+    GM = new GameMap();
+    moves = 0;
     mapInitializer();
-    POSITION = new Coordinate(column, row);
   }
 
   int decideMove() {
+    /* basic strat: move in a cricle towards the center collecting info until monster is sighted. once monster is sighted,
+     * run an algorithm that finds the largest path around a group of clustered objects (within 2 blocks of each other) and
+     * then just repeat that. unless really unlucky the monster should never catch us, however once i finish what i've described i
+     * will try to add a var to keep track of the monster and a check to make sure the user is always x moves travel away from the monster.
+     * 
+    */
     // TODO: choose moves based off of game map
+    LOG.info("Total moves played: " + TOTAL_MOVES);
+    LOG.info("Move number " + moves + " in this game.");
+    System.out.println("Total moves played: " + TOTAL_MOVES);
+    System.out.println("Move number " + moves + " in this game.");
     LookData movesLookData = new LookData(this);
-    System.out.println(movesLookData.toString());
-    GM.submitLookData(POSITION, movesLookData);
-    int move = utils.get_int_input("Choose your direction: ", 0, 8, new Scanner(System.in));
-    // System.out.println(GM.toString());
+    GM.submitLookData(new Coordinate(this.column + 1, this.row + 1), movesLookData);
+    int move = Model.random(0, 8);
+    System.out.println(GM.toString());
+    LOG.debug(GM.toString());
+    moves++;
+    TOTAL_MOVES++;
 		return move;
   }
   
