@@ -32,9 +32,7 @@ public class BankObject {
                 this.housing = data.get(6).toString().equalsIgnoreCase("yes");
                 this.loan = data.get(7).toString().equalsIgnoreCase("yes");
                 this.subscribed = data.get(8).toString().equalsIgnoreCase("yes");
-                this.size = 10;
-                
-                
+                this.size = 10;    
             }
         } catch(NumberFormatException e){
             System.out.println("Wrong array size.");

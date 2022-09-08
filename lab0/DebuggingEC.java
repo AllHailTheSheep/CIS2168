@@ -67,7 +67,6 @@ public class DebuggingEC {
 
         //for each item in dataToSend, we create a bankObject with its information. Add this to a list 
         for (List account : dataToSend){
-            
             BankObject tempBankObject = new BankObject(account);
             bankObjectListTraining.add(tempBankObject);
 
