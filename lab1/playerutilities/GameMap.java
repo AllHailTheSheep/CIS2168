@@ -2,7 +2,6 @@ package lab1.playerutilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -21,10 +20,12 @@ public class GameMap {
     private Coordinate monsterPos;
     public LinkedHashMap<String, Coordinate> QUADRANTS = new LinkedHashMap<String, Coordinate>();
     private LinkedHashMap<Double, Integer> ATAN2ANGLES = new LinkedHashMap<Double, Integer>();
+    public ArrayList<Coordinate> BUSHES = new ArrayList<Coordinate>();
 
     public GameMap() {
         initializeMaps();
     }
+
 
     public int determineDirection(Coordinate pos, Coordinate dest) {
         pos.swap();
@@ -33,8 +34,6 @@ public class GameMap {
         Double atan2res = Math.atan2(dest.getY() - pos.getY(), dest.getX() - pos.getX());
         Double closest = closest(atan2res, angles);
         int res = ATAN2ANGLES.get(closest);
-        System.out.println(pos.toString() + " to " + dest.toString());
-        System.out.println(atan2res + " goes to " + closest + " which is direction " + Person.DIRECTIONS_MAP.get(res));
         return res;
     }
 
@@ -106,6 +105,9 @@ public class GameMap {
                 if (i == distance) {
                     // place object
                     grid.put(focus, object);
+                    if (object == 3) {
+                        BUSHES.add(focus);
+                    }
                     if (object == 1) {
                         monsterSighted++;
                         monsterPos = focus.copy();

@@ -16,8 +16,10 @@ public class Person extends Creature {
   public static HashMap<Integer, String> OBJECT_MAP = new HashMap<Integer, String>();
   public static HashMap<Integer, String> DIRECTIONS_MAP = new HashMap<Integer, String>();
   public static ArrayList<Integer> DIRECTIONS_LIST;
-  private Coordinate quadFarthestFromMonster = null;
-  private Coordinate bestQuadrant = null;
+  public static ArrayList<Integer> SMALL_CIRCLE = new ArrayList<Integer>();
+  private boolean RUNNING = false;
+  private int STARTEDRUNNING = -1;
+  private Coordinate bush = new Coordinate(-1, -1);
   private GameMap GM = null;
   private Integer moves_num = null;
 
@@ -59,33 +61,66 @@ public class Person extends Creature {
     Coordinate pos = new Coordinate(this.row + 1, this.column + 1);
     GM.submitLookData(pos, movesLookData);
 
-    int move;
-    if (bestQuadrant == null) {
-      bestQuadrant = GM.determineShortest(pos, new ArrayList<Coordinate>(GM.QUADRANTS.values()));
-    }
-    if (GM.monsterSighted == -1 && !pos.within(bestQuadrant, 2)) {
-      // monster has not been seen, move towards the closest quadrant
-      LOG.info("Moving towards " + bestQuadrant.toString());
-      System.out.println("Moving towards " + bestQuadrant.toString());
-      move = GM.determineDirection(pos.copy(), bestQuadrant.copy());
-    } else if (GM.monsterSighted == -1 && pos.within(bestQuadrant, 2)) {
-      // TODO: make this bit do cirlces instead and see if it increases the grade
-      LOG.info("Within 3 blocks of bestQuadrant and monster has not been seen, doing random shit");
-      System.out.println("random move");
-      move = Model.random(0, 7);
-    } else {
-      // monster has been seen
-      LOG.info("Monster has been seen");
-      System.out.println("monster has been seen");
-      Coordinate monsterPos = GM.getMonsterPos();
-      if (quadFarthestFromMonster == null || pos.within(quadFarthestFromMonster, 2)) {
-        quadFarthestFromMonster = GM.determineFarthest(monsterPos, new ArrayList<Coordinate>(GM.QUADRANTS.values()));
-        System.out.println("quadFarthestFromMonster set to " + quadFarthestFromMonster.toString());
-        LOG.info("quadFarthestFromMonster set to " + quadFarthestFromMonster.toString());
-        // find a bush to move around
+
+    // TODO: Find a better way to do this.
+    Integer move = null;
+    if (!RUNNING) {
+      if (GM.monsterSighted == -1) {
+        System.out.println("go to nearest marker");
+        move = GM.determineDirection(pos, GM.determineShortest(pos, new ArrayList<Coordinate>(GM.QUADRANTS.values())));
+      } else if (GM.monsterSighted == 0 ) {
+        System.out.println("set bush and move towards it");
+        bush = GM.determineShortest(pos, GM.BUSHES);
+        move = GM.determineDirection(pos, bush.copy());
+        GM.monsterSighted++;
+      } else if (GM.monsterSighted > 0 && pos.distance(bush.copy()) > 2) {
+        // why do coords keep flipping?
+        System.out.println("Move towards bush " + bush.toString() +  pos.distance(bush.copy()));
+        move = GM.determineDirection(pos, bush);
+      } else if (GM.monsterSighted > 0 && pos.distance(bush) <= 2) {
+        // TODO: troubleshoot this
+        if (pos.distance(GM.getMonsterPos()) > 6) {
+          // circle bush
+          System.out.println("circling bush " + pos.distance(bush));
+          int startDir = GM.determineDirection(pos, bush);
+          for (int i = 0; i < 8; i++) {
+            if (pos.distance(GM.coordinateManipulator(pos.copy(), i, 1)) < 2) {
+              move = i;
+            }
+          }
+        } else if (pos.distance(GM.getMonsterPos()) <= 6 && pos.distance(GM.getMonsterPos()) >= 3) {
+          System.out.println("waiting for monster to get within 2: " + pos.distance(GM.getMonsterPos()));
+          move = 8;
+        } else if (pos.distance(GM.getMonsterPos()) <= 3) {
+          System.out.println("We are now running");
+          STARTEDRUNNING = moves_num;
+          RUNNING = true;
+        }
+      } else {
+        System.out.println("This happened");
       }
-      // if move brings us closer to the monster, put a bush between us before moving to the best quadrant
-      move = GM.determineDirection(pos.copy(), quadFarthestFromMonster.copy());
+    }
+    
+    if (RUNNING) {
+      // make sure this move is away from the monster
+      if (STARTEDRUNNING == moves_num) {
+        ArrayList<Coordinate> coords = GM.BUSHES;
+        ArrayList<Coordinate> toRemove = new ArrayList<Coordinate>();
+        for (Coordinate c : coords) {
+          if (c.distance(pos) > c.distance(GM.getMonsterPos())) {
+            toRemove.add(c);
+          }
+        }
+        for (Coordinate c : toRemove) {
+          coords.remove(c);
+        }
+        bush = GM.determineFarthest(GM.getMonsterPos(), coords);
+      } 
+      move = GM.determineDirection(pos, bush);
+      if (pos.distance(GM.getMonsterPos()) >= 6) {
+        System.out.println("since we are at " + pos.toString() + " and monst is at " + GM.getMonsterPos().toString() + " set running to false as distance is " + pos.distance(GM.getMonsterPos()));
+        RUNNING = false;
+      }
     }
 
     // log end of move data, and increment move counter
@@ -99,18 +134,17 @@ public class Person extends Creature {
   }
 
   private int alterImpossibleMove(int move) {
-    int offset = 1;
-    // deal with impossible moves
-    while (!canMove(move)) {
-      if (canMove((move + offset) % 8)) {
-        move = (move + offset) % 8;
-      } else if (canMove((move - offset) % 8)) {
-        move = (move - offset) % 8;
-      } else {
-        offset++;
+    if (!canMove(move)) {
+      if (canMove(move + 1)) {
+        return move + 1;
+      } else if (canMove(move - 1)) {
+        return move - 1;
+      } else if (canMove(move + 2)) {
+        return move + 2;
+      } else if (canMove(move - 2)) {
+        return move - 2;
       }
     }
-    LOG.info("Changed move to " + move);
     return move;
   }
 
@@ -145,6 +179,11 @@ public class Person extends Creature {
     DIRECTIONS_MAP.put(7, "NW");
     DIRECTIONS_MAP.put(8, "STAY");
     DIRECTIONS_LIST = new ArrayList<Integer>(DIRECTIONS_MAP.keySet());
+
+    SMALL_CIRCLE.add(1);
+    SMALL_CIRCLE.add(3);
+    SMALL_CIRCLE.add(5);
+    SMALL_CIRCLE.add(7);
 
     // object map initializers
     OBJECT_MAP.put(0, "EDGE");
