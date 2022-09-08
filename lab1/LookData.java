@@ -1,11 +1,10 @@
-package lab1.playerutilities;
+package lab1;
 
 import java.util.HashMap;
-
-import lab1.Person;
+import java.util.LinkedHashMap;
 
 public class LookData extends HashMap<Integer, Integer[]> {
-    private HashMap<Integer, Integer[]> data;
+    private LinkedHashMap<Integer, Integer[]> data;
 
     // ideally id define the data getting operation here but we would not be able to access look() or distance(), speedBar
     // passing the person in is the next best thing.

@@ -1,7 +1,5 @@
 package lab1;
 
-
-
 import java.awt.*;
 import java.util.Vector;
 

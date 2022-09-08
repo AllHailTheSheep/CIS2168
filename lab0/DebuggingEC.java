@@ -81,9 +81,6 @@ public class DebuggingEC {
             BankObject tempHolder = bankObjectListTraining.get(randomIndex);
             bankObjectListTesting.add(tempHolder);
             bankObjectListTraining.remove(randomIndex);
-            
-            
-            
         }
         
         //create DecisionTreeTools Object to make things easier to access and read.

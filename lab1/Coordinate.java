@@ -1,4 +1,4 @@
-package lab1.playerutilities;
+package lab1;
 
 import java.util.Objects;
 
@@ -15,18 +15,8 @@ public class Coordinate {
         int temp = this.y;
         this.y = this.x;
         this.x = temp;
-
     }
 
-    
-    public boolean within(Coordinate c, int tolerance) {
-        Double dist = distance(c);
-        if (dist <= tolerance) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     public double distance(Coordinate c) {
         double ac = Math.abs(c.getY() - this.y);

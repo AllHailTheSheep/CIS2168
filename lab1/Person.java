@@ -1,151 +1,114 @@
 package lab1;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import lab1.playerutilities.Coordinate;
-import lab1.playerutilities.GameMap;
-import lab1.playerutilities.LookData;
+import java.util.LinkedHashMap;
 
 public class Person extends Creature {
-  // note there's a lot happening so i've seperated the debug and info logs
-  private static final Logger LOG = LogManager.getLogger(GameMap.class);
   public static HashMap<Integer, String> OBJECT_MAP = new HashMap<Integer, String>();
   public static HashMap<Integer, String> DIRECTIONS_MAP = new HashMap<Integer, String>();
   public static ArrayList<Integer> DIRECTIONS_LIST;
-  public static ArrayList<Integer> SMALL_CIRCLE = new ArrayList<Integer>();
-  private boolean RUNNING = false;
-  private int STARTEDRUNNING = -1;
-  private Coordinate bush = new Coordinate(-1, -1);
-  private GameMap GM = null;
-  private Integer moves_num = null;
-
-  /** 
-   * IDEAS FOR IMPROVEMENT:
-   * create a seperate class to hold moves and move generation tools
-   * add a DANGER_ZONE integer that is the minimum moves from the monster a move has to guarantee to be accepted.
-   */ 
-
+  public ArrayList<Coordinate> BUSHES = new ArrayList<Coordinate>();
+  public Coordinate MONSTER = new Coordinate(-1, -1);
+  public Coordinate POS = new Coordinate(-1, -1);
+  public boolean canSeeMonster = false;
+  public int MONSTERDIR = -1;
+  
   public Person(Model model, int row, int column) {
     super(model, row, column);
-    // the things initialized here are not persistent across games, so everything works when the grader is run.
     initializeMaps();
-    GM = new GameMap();
-    moves_num = 0;
   }
-
-  
-  /** 
-   * This function returns our move.
-   * @return int The direction to move.
-   */
-  int decideMove() {
-    /* basic strat: move in a cricle towards the center collecting info until monster is sighted. once monster is 
-     * sighted, run an algorithm that finds the largest path around a group of clustered objects (within 2 blocks of
-     * each other) and then just repeat that. unless really unlucky the monster should never catch us, however once i
-     * finish what i've described i will try to add a var to keep track of the monster and a check to make sure the
-     * user is always x moves travel away from the monster.
-     */
-    // log some info
-    LOG.info("Move number " + moves_num + " in this game.");
-    // print the same
-    // System.out.println("Total moves played: " + TOTAL_MOVES);
-    // System.out.println("Move number " + moves_num + " in this game.");
-
-    // initialize, collect, and submit our moves LookData
-    LookData movesLookData = new LookData(this);
-    // the +1 is for our edge offset, as described in the GameModel
-    Coordinate pos = new Coordinate(this.row + 1, this.column + 1);
-    GM.submitLookData(pos, movesLookData);
-
-
-    // TODO: Find a better way to do this.
-    Integer move = null;
-    if (!RUNNING) {
-      if (GM.monsterSighted == -1) {
-        System.out.println("go to nearest marker");
-        move = GM.determineDirection(pos, GM.determineShortest(pos, new ArrayList<Coordinate>(GM.QUADRANTS.values())));
-      } else if (GM.monsterSighted == 0 ) {
-        System.out.println("set bush and move towards it");
-        bush = GM.determineShortest(pos, GM.BUSHES);
-        move = GM.determineDirection(pos, bush.copy());
-        GM.monsterSighted++;
-      } else if (GM.monsterSighted > 0 && pos.distance(bush.copy()) > 2) {
-        // why do coords keep flipping?
-        System.out.println("Move towards bush " + bush.toString() +  pos.distance(bush.copy()));
-        move = GM.determineDirection(pos, bush);
-      } else if (GM.monsterSighted > 0 && pos.distance(bush) <= 2) {
-        // TODO: troubleshoot this
-        if (pos.distance(GM.getMonsterPos()) > 6) {
-          // circle bush
-          System.out.println("circling bush " + pos.distance(bush));
-          int startDir = GM.determineDirection(pos, bush);
-          for (int i = 0; i < 8; i++) {
-            if (pos.distance(GM.coordinateManipulator(pos.copy(), i, 1)) < 2) {
-              move = i;
-            }
-          }
-        } else if (pos.distance(GM.getMonsterPos()) <= 6 && pos.distance(GM.getMonsterPos()) >= 3) {
-          System.out.println("waiting for monster to get within 2: " + pos.distance(GM.getMonsterPos()));
-          move = 8;
-        } else if (pos.distance(GM.getMonsterPos()) <= 3) {
-          System.out.println("We are now running");
-          STARTEDRUNNING = moves_num;
-          RUNNING = true;
-        }
-      } else {
-        System.out.println("This happened");
-      }
-    }
     
-    if (RUNNING) {
-      // make sure this move is away from the monster
-      if (STARTEDRUNNING == moves_num) {
-        ArrayList<Coordinate> coords = GM.BUSHES;
-        ArrayList<Coordinate> toRemove = new ArrayList<Coordinate>();
-        for (Coordinate c : coords) {
-          if (c.distance(pos) > c.distance(GM.getMonsterPos())) {
-            toRemove.add(c);
-          }
-        }
-        for (Coordinate c : toRemove) {
-          coords.remove(c);
-        }
-        bush = GM.determineFarthest(GM.getMonsterPos(), coords);
-      } 
-      move = GM.determineDirection(pos, bush);
-      if (pos.distance(GM.getMonsterPos()) >= 6) {
-        System.out.println("since we are at " + pos.toString() + " and monst is at " + GM.getMonsterPos().toString() + " set running to false as distance is " + pos.distance(GM.getMonsterPos()));
-        RUNNING = false;
+  int decideMove() {
+    POS.setY(this.row);
+    POS.setX(this.column);
+
+    LookData movesLookData = new LookData(this);
+    // System.out.println(movesLookData.toString());
+    // parse move data
+    for (Integer dir : DIRECTIONS_LIST) {
+      Integer[] data = movesLookData.getData(dir);
+      if (data[0] == 1) {
+        // add to monster pos
+        Coordinate mons_pos = calculateNewCoord(dir, data[1]);
+        // System.out.println("SAW MONSTER AT: " + mons_pos.toString());
+        MONSTER.setX(mons_pos.getX());
+        MONSTER.setY(mons_pos.getY());
+        MONSTERDIR = dir;
+        canSeeMonster = true;
+      } else if (data[0] == 3) {
+        // add bush pos
+        Coordinate bush_pos = calculateNewCoord(dir, data[1]);
+        BUSHES.add(bush_pos);
+        // System.out.println("BUSH at " + bush_pos.toString());
       }
     }
 
-    // log end of move data, and increment move counter
-    // System.out.println(GM.toString());
-    LOG.info(GM.toString());
-    moves_num++;
-    int res = alterImpossibleMove(move);
-    System.out.println("move: " + move + " res: " + res);
-    System.out.println();
-		return res;
+    Integer move = null;
+    if (canSeeMonster) {
+      // determine which direction the monster is and move out of sight
+      // TODO: make this so we dont have to worry about moving towards the monster
+      int offset = 1;
+      // System.out.println(DIRECTIONS_MAP.get(MONSTERDIR));
+      ArrayList<Integer> acceptableDirs = new ArrayList<Integer>();
+      acceptableDirs.add(turn(MONSTERDIR, 1));
+      acceptableDirs.add(turn(MONSTERDIR, -1));
+      while(!canMove(turn(MONSTERDIR, offset)) || acceptableDirs.contains(turn(MONSTERDIR, offset))) {
+        offset++;
+      }
+      move = turn(MONSTERDIR, offset);
+      // System.out.println("MOVE: " + DIRECTIONS_MAP.get(move));
+      canSeeMonster = false;
+    } else {
+      move = 8;
+    }
+		return move;
   }
 
-  private int alterImpossibleMove(int move) {
-    if (!canMove(move)) {
-      if (canMove(move + 1)) {
-        return move + 1;
-      } else if (canMove(move - 1)) {
-        return move - 1;
-      } else if (canMove(move + 2)) {
-        return move + 2;
-      } else if (canMove(move - 2)) {
-        return move - 2;
-      }
+
+  private int turn(int direction, int number) {
+      int mod = (direction + number) % (7 - 0 + 1);
+      if (mod >= 0) return mod;
+      else return 8 + mod;
+  }
+
+  private Coordinate calculateNewCoord(int dir, int distance) {
+    Coordinate loc = new Coordinate(row, column);
+    switch (dir) {
+      case 0:
+        loc.setX(this.row - distance);
+        break;
+      case 1:
+        loc.setX(this.row - distance);
+        loc.setY(this.column + distance);
+        break;
+      case 2:
+        loc.setY(this.column + distance);
+        break;
+      case 3:
+        loc.setX(this.row + distance);
+        loc.setY(this.column + distance);
+        break;
+      case 4:
+        loc.setX(this.row + distance);
+        break;
+      case 5:
+        loc.setX(this.row + distance);
+        loc.setY(this.column - distance);
+        break;
+      case 6:
+        loc.setY(this.column - distance);
+        break;
+      case 7:
+        loc.setX(this.row - distance);
+        loc.setY(this.column - distance);
+        break;
+      case 8:
+        break;
     }
-    return move;
+    // i realized i did these backwards but thats why i implemented this.
+    loc.swap();
+    return loc;
   }
 
 
@@ -153,8 +116,8 @@ public class Person extends Creature {
    * This function returns a HashMap containing the direction, the object and the distance to the object.
    * @return HashMap<Integer, Integer[]> The HashMap in format <Integer:direction, Integer[]:[object, distance]>
    */
-  public HashMap<Integer, Integer[]> lookAround() {
-    HashMap<Integer, Integer[]> result = new HashMap<Integer, Integer[]>();
+  public LinkedHashMap<Integer, Integer[]> lookAround() {
+    LinkedHashMap<Integer, Integer[]> result = new LinkedHashMap<Integer, Integer[]>();
     for (int direction : DIRECTIONS_MAP.keySet()) {
       Integer[] data = new Integer[2];
       data[0] = look(direction);
@@ -164,9 +127,6 @@ public class Person extends Creature {
     return result;
   }
 
-  /** 
-   * This function initalizes the constant maps we use for reference.
-   */
   private void initializeMaps() {
     // direction map initializers
     DIRECTIONS_MAP.put(0, "N");
@@ -179,11 +139,6 @@ public class Person extends Creature {
     DIRECTIONS_MAP.put(7, "NW");
     DIRECTIONS_MAP.put(8, "STAY");
     DIRECTIONS_LIST = new ArrayList<Integer>(DIRECTIONS_MAP.keySet());
-
-    SMALL_CIRCLE.add(1);
-    SMALL_CIRCLE.add(3);
-    SMALL_CIRCLE.add(5);
-    SMALL_CIRCLE.add(7);
 
     // object map initializers
     OBJECT_MAP.put(0, "EDGE");
