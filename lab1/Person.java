@@ -48,14 +48,13 @@ public class Person extends Creature {
     if (canSeeMonster) {
       // determine which direction the monster is and move out of sight
       // TODO: make this so we dont have to worry about moving towards the monster
-      int offset = 1;
       // System.out.println(DIRECTIONS_MAP.get(MONSTERDIR));
-      ArrayList<Integer> acceptableDirs = new ArrayList<Integer>();
-      acceptableDirs.add(turn(MONSTERDIR, 1));
-      acceptableDirs.add(turn(MONSTERDIR, -1));
+      ArrayList<Integer> acceptableDirs = getAcceptableDirs(); // dirs that are -1 and 1 from monster
+      int offset = 1;
       while(!canMove(turn(MONSTERDIR, offset)) || acceptableDirs.contains(turn(MONSTERDIR, offset))) {
         offset++;
-      }
+      } // grades to 70%, escapes 50% of the time
+
       move = turn(MONSTERDIR, offset);
       // System.out.println("MOVE: " + DIRECTIONS_MAP.get(move));
       canSeeMonster = false;
@@ -63,6 +62,20 @@ public class Person extends Creature {
       move = 8;
     }
 		return move;
+  }
+
+  private ArrayList<Integer> getAcceptableDirs() {
+    ArrayList<Integer> acceptableDirs = new ArrayList<Integer>();
+    acceptableDirs.add(turn(MONSTERDIR, -1));
+    acceptableDirs.add(turn(MONSTERDIR, 1));
+    // acceptableDirs.add(turn(MONSTERDIR, 4));
+    // acceptableDirs.add(turn(MONSTERDIR, 3));
+    // acceptableDirs.add(turn(MONSTERDIR, 5));
+    //System.out.println("MONSTER DIR: " + DIRECTIONS_MAP.get(MONSTERDIR));
+    // for (int dir : acceptableDirs) { 
+    //   System.out.println(DIRECTIONS_MAP.get(dir));
+    // }
+    return acceptableDirs;  
   }
 
 
