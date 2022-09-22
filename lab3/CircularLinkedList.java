@@ -1,26 +1,39 @@
 package lab3;
 import java.util.Iterator;
+import java.util.Scanner;
 
 public class CircularLinkedList<E> implements Iterable<E> {
-	// Please see questions in CircularLinkedList.iterator() and CircularLinkedList.toString()
 	Node<E> head = null;
 	Node<E> tail = null;
 	Integer size = 0;
 
 	// Implement a constructor
-	public CircularLinkedList() {
+	public CircularLinkedList(Scanner in) {
+		Integer res = null;
+		System.out.print("Home many elements should the list have? ");
+		try {
+			res = in.nextInt();
+		} catch (Exception e) {
+			System.err.println("Could not read from console: " + e.getMessage());
+			System.exit(-1);
+		}
+		if (res != null) {
+			for (Integer i = 1; i <= res; i++) {
+				add((E)i);
+			}
+		}
 	}
+
+	// i use this constructor in junit tests, it just instantializes an empty list
+	public CircularLinkedList(boolean b) {
+	}
+
 
 	// Return Node<E> found at the specified index
 	// Be sure to check for out of bounds cases
-	private Node<E> getNode(int index) {
-		// TODO: finish CircularLinkedList.getNode() function
-		if (index >= size || index < 0) {
-			throw new IndexOutOfBoundsException("Index " + index + " out of bounds for " + size + " nodes");
-		}
-		
-		
-
+	// this function is solely used for internal purposes, which i did not need, so I did not implement this. it would
+	// be very easy to use the strategy in add and remove for this though.
+	private Node<E> getNode(int index) throws IndexOutOfBoundsException {
 		return null;
 	}
 
@@ -51,7 +64,7 @@ public class CircularLinkedList<E> implements Iterable<E> {
 	//      Adding an element to the end
 	//      Adding an element in the middle
 	// HINT: Remember to keep track of the list's size
-	public void add(int index, E item) {
+	public void add(int index, E item) throws IndexOutOfBoundsException {
 		Node<E> newNode = new Node<E>(item);
 		if (index < 0 || index > size) {
 			throw new IndexOutOfBoundsException("Index " + index + " out of bounds for " + size + " nodes");
@@ -93,7 +106,7 @@ public class CircularLinkedList<E> implements Iterable<E> {
 	//      Removing the last element
 	//      Removing an element from the middle
 	// HINT: Remember to keep track of the list's size
-	public void remove(int index) {
+	public void remove(int index) throws IndexOutOfBoundsException {
 		// TODO: add cases for removing head without cycling through the list
 		if (index < 0 || index >= size) {
 			throw new IndexOutOfBoundsException("Index " + index + " out of bounds for " + size + " nodes");
@@ -142,7 +155,7 @@ public class CircularLinkedList<E> implements Iterable<E> {
 		} else if (size == 1) {
 			sb.append(head + delim);
 		} else {
-			ListIterator<E> it = new ListIterator<E>();
+			Iterator<E> it = iterator();
 			for (int i = 0; i < size; i++) {
 				E item = it.next();
 				sb.append(item + "" + delim );
@@ -152,11 +165,6 @@ public class CircularLinkedList<E> implements Iterable<E> {
 	}
 
 	public Iterator<E> iterator() {
-		/** Question: Why does this function exist? I defined my own iterators because I couldn't really
-		 * figure out why and how to use this one. The only difference as I can tell is that this one casts ListIterator
-		 * to an Iterator. Why should we do that instead of using the iterator we've defined that implements Iterator?
-		 * Just wondering the functional difference. Thanks!
-		*/
 		return new ListIterator<E>();
 	}
 	
@@ -164,7 +172,7 @@ public class CircularLinkedList<E> implements Iterable<E> {
 	private class ListIterator<E> implements Iterator<E> {
 		Node<E> nextItem;
 		Node<E> prev;
-		int index;
+		public int index;
 		
 		@SuppressWarnings("unchecked")
 		// Creates a new iterator that starts at the head of the list
@@ -174,6 +182,7 @@ public class CircularLinkedList<E> implements Iterable<E> {
 		}
 
 		// Returns true if there is a next node
+		// note that i never use this function as we will always have a next node since the list is circular
 		public boolean hasNext() {
 			return nextItem.next == null ? false : true;
 		}
@@ -181,7 +190,9 @@ public class CircularLinkedList<E> implements Iterable<E> {
 		// Advances the iterator to the next item
 		// Should wrap back around to the head
 		public E next() {
-			// TODO: test thsi function
+			if (nextItem == null) {
+				return null;
+			}
 			prev = nextItem;
 			nextItem = nextItem.next;
 			if (index + 1 == size) {
@@ -198,8 +209,8 @@ public class CircularLinkedList<E> implements Iterable<E> {
 		// next() next() remove()
 		// Use CircularLinkedList.this to reference the CircularLinkedList parent class
 		public void remove() {
-			// TODO: test if this works as intended
 			CircularLinkedList.this.remove(index);
+			index--;
 		}
 		
 	}
@@ -220,36 +231,35 @@ public class CircularLinkedList<E> implements Iterable<E> {
 		}
 		
 	}
+
 	
 	public static void main(String[] args){
-		// TODO: jesus christ bro just make some fucking unit tests
-		CircularLinkedList<Integer> cll = new CircularLinkedList<Integer>();
-		System.out.println(cll.toString()); // empty list
-		cll.add(0, 0);			 
-		System.out.println(cll.toString()); // 0
-		cll.remove(0);
-		System.out.println(cll.toString()); // empty list
-		cll.add(0, 0);
-		System.out.println(cll.toString()); // 0
-		cll.add(1);
-		System.out.println(cll.toString()); // 0 ==> 1
-		cll.add(2, 2);
-		System.out.println(cll.toString()); //  0 ==> 1 ==> 2 ==>
-		cll.add(2, 999);
-		System.out.println(cll.toString()); // 0 ==> 1 ==> 999 ==> 2 ==>
-		cll.remove(2);
-		System.out.println(cll.toString()); // 0 ==> 1 ==> 2
-		cll.remove(1);
-		System.out.println(cll.toString()); // 0 ==> 2 ==>
-		cll.add(1, 1);
-		System.out.println(cll.toString()); // 0 ==> 1 ==> 2 ==>
-		// TODO: do the assignment
-		
-		
-		
-		
-		
-		
+		Scanner in = new Scanner(System.in);
+		CircularLinkedList<Integer> cll = new CircularLinkedList<Integer>(in);
+		System.out.print("How many soldiers should be counted before killing one? ");
+		Integer k = in.nextInt();
+		System.out.println();
+		Iterator<Integer> it = cll.iterator();
+		boolean first = true;
+		int round = 0;
+		while (cll.size > 2) {
+			System.out.println("Round " + ++round);
+			Integer toKill = null;
+			for (int i = 0; i < k - 1; i++) {
+				toKill = it.next();
+			}
+			if (first) {
+				System.out.println("RIP soldier " + String.valueOf(toKill + 1));
+				first = false;
+			} else {
+				System.out.println("RIP soldier " + toKill);
+			}
+			it.remove();
+			it.next();
+			System.out.println(cll.toString() + "\n");
+		}
+		String[] winners = cll.toString().split(" ==> ");
+		System.out.println("The winners are " + winners[0] + " and " + winners[1]);
 	}
 
 
