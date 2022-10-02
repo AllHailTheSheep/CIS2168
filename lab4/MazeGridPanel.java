@@ -35,36 +35,49 @@ public class MazeGridPanel extends JPanel {
 		boolean finished = false;
 		while (!finished && !stack.isEmpty()) {
 			Cell cell = stack.peek();
-			boolean moved = false;
-			for (int i = 0; i < 4; i++) {
-				Cell focus = cellManipulator(cell, i);
-				if (focus == null) {
-					continue;
-				} else if (canMove(cell, i) && visited(focus)) {
-					stack.push(focus);
-					focus.setBackground(Color.BLUE);
-					moved = true;
-				}
+
+			Cell northCell = cellManipulator(cell, 0);
+			Cell eastCell = cellManipulator(cell, 1);
+			Cell southCell = cellManipulator(cell, 2);
+			Cell westCell = cellManipulator(cell, 3);
+
+			if (cell.equals(finish)) {
+				finished = true;
 			}
-			if (!moved) {
-				cell.setBackground(Color.BLACK);
+			if (northCell != null && !visited(northCell) && !cell.northWall) {
+				System.out.println("can move north to " + northCell.row + " " + northCell.col);
+				stack.push(northCell);
+				cell.setBackground(Color.GRAY);
+			} else if (eastCell != null && !visited(eastCell) && !cell.eastWall) {
+				System.out.println("can move east to " + eastCell.row + " " + eastCell.col);
+				stack.push(eastCell);
+				cell.setBackground(Color.GRAY);
+			} else if (southCell != null && !visited(southCell) && !cell.southWall) {
+				System.out.println("can move south to " + southCell.row + " " + southCell.col);
+				stack.push(southCell);
+				cell.setBackground(Color.GRAY);
+			} else if (westCell != null && !visited(westCell) && !cell.westWall) {
+				System.out.println("can move west to " + westCell.row + " " + westCell.col);
+				stack.push(westCell);
+				cell.setBackground(Color.GRAY);
+			} else {
+				cell.setBackground(Color.CYAN);
 				stack.pop();
 			}
 		}
 	}
 
-	private Cell cellManipulator(Cell c, int dir) {
+	public Cell cellManipulator(Cell c, int dir) {
 		if (dir < 0 || dir > 3) {
 			System.err.println("Index needs to be between 0 and 3");
 			System.exit(-1);
 		}
-		System.out.println(c.row + " " + c.col + " " + dir);
 		Cell toReturn = null;
 		switch(dir) {
 			// north
 			case 0: {
-				if (isInMaze(c.row + 1, c.col)) {
-					toReturn = maze[c.row + 1][c.col];
+				if (isInMaze(c.row - 1, c.col)) {
+					toReturn = maze[c.row - 1][c.col];
 				}
 				break;
 			}
@@ -77,8 +90,8 @@ public class MazeGridPanel extends JPanel {
 			}
 			// south
 			case 2: {
-				if (isInMaze(c.row - 1, c.col)) {
-					toReturn = maze[c.row - 1][c.col];
+				if (isInMaze(c.row + 1, c.col)) {
+					toReturn = maze[c.row + 1][c.col];
 				}
 				break;
 			}
@@ -91,57 +104,14 @@ public class MazeGridPanel extends JPanel {
 			}
 		}
 		return toReturn;
-
 	}
 
-	static boolean isInMaze(int row, int col) {
+	public boolean isInMaze(int row, int col) {
 		if (row < 0 || row >= 25 || col < 0 || col >= 25) {
 			return false;
 		} else {
 			return true;
 		}
-	}
-
-	private boolean canMove(Cell c, int dir) {
-		if (dir < 0 || dir > 3) {
-			System.err.println("Index needs to be between 0 and 3");
-			System.exit(-1);
-		}
-		switch(dir) {
-			// north
-			case 0: {
-				Cell focus = maze[c.row + 1][c.col];
-				if (!visited(focus)) {
-					return true;
-				}
-				break;
-			}
-			// east
-			case 1: {
-				Cell focus = maze[c.row][c.col + 1];
-				if (!visited(focus)) {
-					return true;
-				}
-				break;
-			}
-			// south
-			case 2: {
-				Cell focus = maze[c.row - 1][c.col];
-				if (!visited(focus)) {
-					return true;
-				}
-				break;
-			}
-			// west
-			case 3: {
-				Cell focus = maze[c.row][c.col - 1];
-				if (!visited(focus)) {
-					return true;
-				}
-				break;
-			}
-		}
-		return false;
 	}
 
 
