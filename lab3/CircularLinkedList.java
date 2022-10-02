@@ -261,9 +261,4 @@ public class CircularLinkedList<E> implements Iterable<E> {
 		String[] winners = cll.toString().split(" ==> ");
 		System.out.println("The winners are " + winners[0] + " and " + winners[1]);
 	}
-
-
-
-	
-	
 }
