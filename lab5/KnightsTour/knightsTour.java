@@ -1,5 +1,7 @@
 package lab5.KnightsTour;
 
+import java.util.Scanner;
+
 import lab5.Board;
 
 public class knightsTour {
@@ -36,12 +38,31 @@ public class knightsTour {
             { -1, 2 } };
 
     public static void main(String[] args) {
-        runAlgorithm(8, 8);
+        Scanner in = new Scanner(System.in);
+        Integer x = getInput("What is the x and y starting coordinate?", in);
+        Integer y = getInput(null, in);
+
+        runAlgorithm(x, y, 8, 8);
 
     }
 
-    public static void runAlgorithm(int r, int c) {
+    private static Integer getInput(String prompt, Scanner in) {
+        System.out.print(prompt);
+        
+        Integer res = null;
+        if (in.hasNextInt()){
+            res = in.nextInt();
+        } else {
+            System.out.println("Input must be an integer!");
+            res = getInput(prompt, in);
+        }
+        in.close();
+        return res;
+    }
+
+    public static void runAlgorithm(int x, int y, int r, int c) {
         Board b = new Board(r, c);
         System.out.println(b.toString());
+
     }
 }
