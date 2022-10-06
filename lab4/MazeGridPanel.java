@@ -18,10 +18,8 @@ public class MazeGridPanel extends JPanel {
 		Stack<Cell> stack = new Stack<Cell>();
 		Cell start = maze[0][0];
 		stack.push(start);
-		
-	}
 
-	
+	}
 
 	public void solveMaze() {
 		Stack<Cell> stack = new Stack<Cell>();
@@ -73,7 +71,7 @@ public class MazeGridPanel extends JPanel {
 			System.exit(-1);
 		}
 		Cell toReturn = null;
-		switch(dir) {
+		switch (dir) {
 			// north
 			case 0: {
 				if (isInMaze(c.row - 1, c.col)) {
@@ -113,7 +111,6 @@ public class MazeGridPanel extends JPanel {
 			return true;
 		}
 	}
-
 
 	public boolean visited(int row, int col) {
 		Cell c = maze[row][col];
