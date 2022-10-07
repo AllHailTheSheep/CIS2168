@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Map.Entry;
+import java.lang.Math;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +23,7 @@ public class knightsTour {
      *      https://en.wikipedia.org/wiki/Knight%27s_tour
      *      https://github.com/douglassquirrel/warnsdorff/blob/master/SGKnightsTourPaper.pdf
      *      https://www.wolframcloud.com/objects/nbarch/2018/10/2018-10-10r6l3m/Knight.nb
-     * this is an implemtation utilizing warnsdoff's heuristic, as well as roth's
+     * this is an implemtation utilizing warnsdorff's heuristic, as well as roth's
      * tie-breaking rule. the premise is:
      * 
      * set the passed in position as initial position
@@ -40,7 +41,7 @@ public class knightsTour {
      * this algorithm should solve the problem on a board up to size 2000, 2000 with
      * a 1% fail rate. there is really no point in implmenting roth's rule in the case
      * of the assignment, as even without the rule this algorithm will work up to size 76,
-     * 76, but it is simple enough and i enjoy making things more complicated
+     * 76, but it is simple enough to do and i enjoy making things more complicated
      */
 
     // these are changes in (x, y) coordinates relative to the current position.
@@ -52,6 +53,7 @@ public class knightsTour {
     private static Logger log = LogManager.getLogger();
 
     public static final Integer SIZE = 8;
+    public static final int[] CENTER = {SIZE/2, SIZE/2};
 
     public static void main(String[] args) {
         // Scanner in = new Scanner(System.in);
@@ -59,7 +61,7 @@ public class knightsTour {
         // in.nextLine();
         // Integer y = getInput("What is the y starting coordinate? ", in);
         // in.close();
-        int x = 1;
+        int x = 7;
         int y = 2;
         
         runAlgorithm(x, y);
@@ -78,17 +80,38 @@ public class knightsTour {
             ArrayList<int[]> nextMoves = getNextMoves(b, x, y);
             log.debug("possible moves: " + nextMoves.size());
             // sort movable sqaures by degree
-            Map<int[], Integer> movesMap = sortMovesByDegree(b, x, y, nextMoves);
+            Map<int[], Integer> movesToDegreeMap = sortMovesByDegree(b, x, y, nextMoves);
             // choose sqaure to move to, breaking ties by greatest euclidean distance to center
-            // TODO: left off working here, some more tests wouldnt be a bad idea but every thing seems to be working up to here
-            chooseMove(movesMap);
+            ArrayList<int[]> bestMoveOrMoves = chooseMove(movesToDegreeMap);
+            int[] nextMove = null;
+            if (bestMoveOrMoves.size() == 1) {
+                nextMove = bestMoveOrMoves.get(0);
+            } else {
+                log.debug("Tie in move degrees: using Roth's rule");
+                int[] best_key = null;
+                double max_distance = Double.MIN_VALUE;
+                for (int[] m : bestMoveOrMoves) {
+                    double distance = calculateEuclideanDistance(m[0], m[1], CENTER[0], CENTER[1]);
+                    log.debug("[" + m[0] + "," + m[1] + "]: " + distance);
+                    if (distance > max_distance) {
+                        best_key = m;
+                        max_distance = distance;
+                    }
+                }
+                nextMove = best_key;
+            }
+            log.debug("Next move: [" + nextMove[0] + ", " + nextMove[1] + "]");
             // move x and y
+            x = nextMove[0];
+            y = nextMove[1];
             // set new postition to move number
+            b.setAtPos(++move, x, y);
+            System.out.println(b.toString());
         }
 
     }
 
-    private static int[] chooseMove(Map<int[], Integer> movesMap ) {
+    private static ArrayList<int[]> chooseMove(Map<int[], Integer> movesMap ) {
         int low = (int) movesMap.values().toArray()[0];
         ArrayList<int[]> toRemove = new ArrayList<int[]>();
         for (Entry<int[], Integer> e : movesMap.entrySet()) {
@@ -99,27 +122,26 @@ public class knightsTour {
         for (int[] e : toRemove) {
             movesMap.remove(e);
         }
-        int[] res = null;
-        if (movesMap.size() > 1) {
-            // return item with greatest euclidean distance to center
-        } else {
-            res = movesMap.keySet().iterator().next();
+        ArrayList<int[]> bestMoveOrMoves = new ArrayList<int[]>();
+        for (Entry<int[], Integer> e : movesMap.entrySet()) {
+            bestMoveOrMoves.add(e.getKey());
         }
-        return null;
-
+        return bestMoveOrMoves;
     }
+
+    public static double calculateEuclideanDistance(int x1, int y1, int x2, int y2) {
+        return Math.hypot(x1-x2, y1-y2);
+    }
+    
 
     private static Map<int[], Integer> sortMovesByDegree(Board b, int x, int y, ArrayList<int[]> moves) {
         HashMap<int[], Integer> map = new HashMap<int[], Integer>();
-        for (int[] move : moves) {
-            Integer degree = calculateDegree(b, x + move[0], y + move[1]);
-            map.put(move, degree);
+        for (int[] m: moves) {
+            Integer degree = calculateDegree(b, m[0], m[1]);
+            map.put(m, degree);
+            log.debug("Degree of [" + m[0] + ", " + m[1] + "]: " + degree);
         }
         Map<int[], Integer> m = sortByValue(map);
-        for (Entry<int[], Integer> e : m.entrySet()) {
-            int[] data = e.getKey();
-            log.debug("Degree of [" + data[0] + ", " + data[1] + "]: " + e.getValue());
-        }
         return m;
     }
 

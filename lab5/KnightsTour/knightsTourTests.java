@@ -2,6 +2,7 @@ package lab5.KnightsTour;
 
 import static org.junit.Assert.*;
 
+import java.net.CacheRequest;
 import java.util.ArrayList;
 
 import org.junit.Test;
@@ -39,6 +40,23 @@ public class knightsTourTests {
         res2.add(new int[] {2, 5});
         res2.add(new int[] {2, 3});
         assertArrayEquals(res2.toArray(), knightsTour.getNextMoves(b, 0, 4).toArray());
+        b.setAtPos(-1, 3, 0);
+    }
+
+    @Test public void testCalculateDegree() {
+        Board b = new Board(8);
+        assertEquals(2, knightsTour.calculateDegree(b, 0, 0));
+        assertEquals(2, knightsTour.calculateDegree(b, 0, 7));
+        assertEquals(2, knightsTour.calculateDegree(b, 7, 0));
+        assertEquals(2, knightsTour.calculateDegree(b, 7, 7));
+        assertEquals(3, knightsTour.calculateDegree(b, 6, 7));
+        assertEquals(8, knightsTour.calculateDegree(b, 4, 4));
+        b.setAtPos(0, 7, 5);
+        assertEquals(2, knightsTour.calculateDegree(b, 6, 7));
+        b.setAtPos(-1, 7, 5);
+        b.setAtPos(44, 6, 1);
+        b.setAtPos(44, 2, 1);
+        assertEquals(6, knightsTour.calculateDegree(b, 4, 2));
     }
 
     
