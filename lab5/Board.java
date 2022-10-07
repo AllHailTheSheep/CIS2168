@@ -1,24 +1,22 @@
 package lab5;
 
 public class Board {
-    private int rows;
-    private int columns;
+    private int SIZE;
     private int[][] board = null;
 
-    public Board(int rows, int columns) {
-        if (rows <= 0 || columns <= 0) {
-            throw new IllegalArgumentException("Rows and columns must be greater than zero!");
+    public Board(int s) {
+        if (s <= 0) {
+            throw new IllegalArgumentException("Size must be greater than zero!");
         }
-        this.rows = rows;
-        this.columns = columns;
+        this.SIZE = s;
         boardInitializer();
     }
 
     private void boardInitializer() {
-        board = new int[rows][columns];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                board[i][j] = 0;
+        board = new int[SIZE][SIZE];
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                board[i][j] = -1;
             }
         }
     }
@@ -26,10 +24,12 @@ public class Board {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < rows; i ++) {
-            for (int j = 0; j < columns; j++) {
+        for (int i = 0; i < SIZE; i ++) {
+            for (int j = 0; j < SIZE; j++) {
                 sb.append(String.valueOf(board[i][j]));
-                sb.append("  ");
+                for (int space = 0; space < 3 - String.valueOf(board[i][j]).length(); space++) {
+                    sb.append(" ");
+                }
             }
             sb.append("\n");
         }
@@ -37,23 +37,25 @@ public class Board {
         return sb.toString();
     }
 
-    public int getRows() {
-        return this.rows;
+    public int getSize() {
+        return this.SIZE;
     }
 
-    public void setRows(int rows) {
-        this.rows = rows;
+    public void setAtPos(int value, int row, int col) {
+        if (!validate(row) || !validate(col)) {
+            throw new IllegalArgumentException("Invalid position, row and col must both be nonnegative and less than than SIZE = " + String.valueOf(SIZE));
+        }
+        board[row][col] = value;
     }
 
-    public int getColumns() {
-        return this.columns;
+    public int getAtPos(int row, int col) {
+        return this.board[row][col];
     }
 
-    public void setColumns(int columns) {
-        this.columns = columns;
-    }
-
-    public int getAtPos(int row, int column) {
-        return this.board[row][column];
+    private boolean validate(int x) {
+        if (x < 0 || x >= SIZE) {
+            return false;
+        }
+        return true;
     }
 }
