@@ -24,16 +24,26 @@ public class Board {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        Integer longest = Integer.MIN_VALUE;
         for (int i = 0; i < SIZE; i ++) {
             for (int j = 0; j < SIZE; j++) {
-                sb.append(String.valueOf(board[i][j]));
-                for (int space = 0; space < 3 - String.valueOf(board[i][j]).length(); space++) {
+                Integer temp = String.valueOf(board[i][j]).length();
+                if (temp > longest) {
+                    longest = temp;
+                }
+            }
+        }
+        // TODO: finish this using longest as spacer
+        for (int i = 0; i < SIZE; i ++) {
+            for (int j = 0; j < SIZE; j++) {
+                String temp = String.valueOf(board[i][j]);
+                sb.append(temp);
+                for (int k = 0; k < longest - temp.length() + 2; k++) {
                     sb.append(" ");
                 }
             }
             sb.append("\n");
         }
-        sb.append("\n");
         return sb.toString();
     }
 

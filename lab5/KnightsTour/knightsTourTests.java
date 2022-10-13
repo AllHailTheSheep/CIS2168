@@ -2,7 +2,6 @@ package lab5.KnightsTour;
 
 import static org.junit.Assert.*;
 
-import java.net.CacheRequest;
 import java.util.ArrayList;
 
 import org.junit.Test;

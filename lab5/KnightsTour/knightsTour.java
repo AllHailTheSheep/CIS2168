@@ -14,8 +14,13 @@ import java.lang.Math;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import lab5.Board;
+
+class NoNextMoves extends Exception {
+    public NoNextMoves(String errMsg, Throwable err) {
+        super(errMsg, err);
+    }
+}
 
 public class knightsTour {
     /*
@@ -41,7 +46,10 @@ public class knightsTour {
      * this algorithm should solve the problem on a board up to size 2000, 2000 with
      * a 1% fail rate. there is really no point in implmenting roth's rule in the case
      * of the assignment, as even without the rule this algorithm will work up to size 76,
-     * 76, but it is simple enough to do and i enjoy making things more complicated
+     * 76, but it is simple enough to do and i enjoy making things more complicated.
+     * i have tested this successfully out to board size 12000, 12000, though i would like to do some more tests
+     * soon on a better system, and i don't think it is guaranteed to work every time for every starting position.
+     * As far as I can tell, it should always work if the x and y coordinates are both even.
      */
 
     // these are changes in (x, y) coordinates relative to the current position.
@@ -56,23 +64,20 @@ public class knightsTour {
     public static final int[] CENTER = {SIZE/2, SIZE/2};
 
     public static void main(String[] args) {
-        // Scanner in = new Scanner(System.in);
-        // Integer x = getInput("What is the x starting coordinate? ", in);
-        // in.nextLine();
-        // Integer y = getInput("What is the y starting coordinate? ", in);
-        // in.close();
-        int x = 7;
-        int y = 2;
-        
-        runAlgorithm(x, y);
+        Scanner in = new Scanner(System.in);
+        Integer x = getInput("What is the x starting coordinate? ", in);
+        in.nextLine();
+        Integer y = getInput("What is the y starting coordinate? ", in);
+        in.close();
+        System.out.println(runAlgorithm(x, y));
     }
 
 
-    public static void runAlgorithm(int x, int y) {
+    public static boolean runAlgorithm(int x, int y) {
         Board b = new Board(SIZE);
         int move = 0;
         b.setAtPos(move, x, y);
-        for (int i = 0; i < SIZE * SIZE; i++) {
+        for (int i = 0; i < SIZE * SIZE - 1; i++) {
             log.trace("i = " + i);
             log.info("x: " + x + ", y: " + y);
             log.info("\n" + b.toString());
@@ -82,7 +87,15 @@ public class knightsTour {
             // sort movable sqaures by degree
             Map<int[], Integer> movesToDegreeMap = sortMovesByDegree(b, x, y, nextMoves);
             // choose sqaure to move to, breaking ties by greatest euclidean distance to center
-            ArrayList<int[]> bestMoveOrMoves = chooseMove(movesToDegreeMap);
+            ArrayList<int[]> bestMoveOrMoves = null;
+            try {
+                bestMoveOrMoves = chooseMove(movesToDegreeMap);
+            } catch (NoNextMoves e) {
+                System.err.println("Unable to find a next move. Ask the developer to implement a backtracking algorithm. " +
+                "For now, try a different starting position. Hint: make sure the starting position is coordinates are " +
+                "either both odd or both even");
+                System.exit(-1);
+            }
             int[] nextMove = null;
             if (bestMoveOrMoves.size() == 1) {
                 nextMove = bestMoveOrMoves.get(0);
@@ -106,13 +119,36 @@ public class knightsTour {
             y = nextMove[1];
             // set new postition to move number
             b.setAtPos(++move, x, y);
+            // System.out.println(b.toString());
+        }
+        // check to see if program reached the correct solution
+        boolean success = true;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (b.getAtPos(i, j) == -1) {
+                    success = false;
+                }
+            }
+        }
+        // boards over size 31 usually don't have print super well within the users terminal
+        if (SIZE < 32) {
             System.out.println(b.toString());
         }
-
+        // TODO: print array list of path
+        return success;
     }
 
-    private static ArrayList<int[]> chooseMove(Map<int[], Integer> movesMap ) {
-        int low = (int) movesMap.values().toArray()[0];
+    
+
+    private static ArrayList<int[]> chooseMove(Map<int[], Integer> movesMap ) throws NoNextMoves {
+        // TODO: add backtracking so that if we get to this point we just move back till we can move to a different
+        // position (this should guarantee that we always get a solution)
+        Integer low = null;
+        try {
+            low = (int) movesMap.values().toArray()[0];
+        } catch (IndexOutOfBoundsException e) {
+            throw new NoNextMoves(null, e);
+        }
         ArrayList<int[]> toRemove = new ArrayList<int[]>();
         for (Entry<int[], Integer> e : movesMap.entrySet()) {
             if (movesMap.get(e.getKey()) != low) {
@@ -215,4 +251,8 @@ public class knightsTour {
         }
         return temp;
     }
+
+    
+    
 }
+
