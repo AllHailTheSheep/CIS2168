@@ -47,7 +47,7 @@ public class knightsTour {
      * a 1% fail rate. there is really no point in implmenting roth's rule in the case
      * of the assignment, as even without the rule this algorithm will work up to size 76,
      * 76, but it is simple enough to do and i enjoy making things more complicated.
-     * i have tested this successfully out to board size 12000, 12000, though i would like to do some more tests
+     * i have tested this successfully out to board size 15000, 15000, though i would like to do some more tests
      * soon on a better system, and i don't think it is guaranteed to work every time for every starting position.
      * As far as I can tell, it should always work if the x and y coordinates are both even.
      */
@@ -58,7 +58,9 @@ public class knightsTour {
     public static int[][] MOVES = {{1, 2}, {2, 1}, {2, -1},  {1, -2}, {-1, -2}, {-2, -1}, {-2, 1},
             {-1, 2}};
 
-    private static Logger log = LogManager.getLogger();
+    // careful with the log, it will quickly get VERY large with large board sizes (i've hit 7 gigabytes, not to
+    // mention that logging WILL be the slowest part of the algorithm).
+    // private static Logger log = LogManager.getLogger();
 
     public static final Integer SIZE = 8;
     public static final int[] CENTER = {SIZE/2, SIZE/2};
@@ -74,16 +76,20 @@ public class knightsTour {
 
 
     public static boolean runAlgorithm(int x, int y) {
+        // Question for the professor: I know Java does not have any form of default parameters. Is there any workaround?
+        // I would love to have a default parameter for printing output (path vs final board output or none) but I don't
+        // know how Java accomplishes this other than overloading.
+        LinkedList<int[]> path = new LinkedList<int[]>();
         Board b = new Board(SIZE);
         int move = 0;
         b.setAtPos(move, x, y);
         for (int i = 0; i < SIZE * SIZE - 1; i++) {
-            log.trace("i = " + i);
-            log.info("x: " + x + ", y: " + y);
-            log.info("\n" + b.toString());
+            // log.trace("i = " + i);
+            // log.info("x: " + x + ", y: " + y);
+            // log.info("\n" + b.toString());
             // determine movable sqaures
             ArrayList<int[]> nextMoves = getNextMoves(b, x, y);
-            log.debug("possible moves: " + nextMoves.size());
+            // log.debug("possible moves: " + nextMoves.size());
             // sort movable sqaures by degree
             Map<int[], Integer> movesToDegreeMap = sortMovesByDegree(b, x, y, nextMoves);
             // choose sqaure to move to, breaking ties by greatest euclidean distance to center
@@ -91,21 +97,22 @@ public class knightsTour {
             try {
                 bestMoveOrMoves = chooseMove(movesToDegreeMap);
             } catch (NoNextMoves e) {
+                // TODO: make this return false for testing
                 System.err.println("Unable to find a next move. Ask the developer to implement a backtracking algorithm. " +
                 "For now, try a different starting position. Hint: make sure the starting position is coordinates are " +
-                "either both odd or both even");
+                "either both odd or both even.");
                 System.exit(-1);
             }
             int[] nextMove = null;
             if (bestMoveOrMoves.size() == 1) {
                 nextMove = bestMoveOrMoves.get(0);
             } else {
-                log.debug("Tie in move degrees: using Roth's rule");
+                // log.debug("Tie in move degrees: using Roth's rule");
                 int[] best_key = null;
                 double max_distance = Double.MIN_VALUE;
                 for (int[] m : bestMoveOrMoves) {
                     double distance = calculateEuclideanDistance(m[0], m[1], CENTER[0], CENTER[1]);
-                    log.debug("[" + m[0] + "," + m[1] + "]: " + distance);
+                    // log.debug("[" + m[0] + "," + m[1] + "]: " + distance);
                     if (distance > max_distance) {
                         best_key = m;
                         max_distance = distance;
@@ -113,13 +120,13 @@ public class knightsTour {
                 }
                 nextMove = best_key;
             }
-            log.debug("Next move: [" + nextMove[0] + ", " + nextMove[1] + "]");
+            // log.debug("Next move: [" + nextMove[0] + ", " + nextMove[1] + "]");
+            path.add(nextMove);
             // move x and y
             x = nextMove[0];
             y = nextMove[1];
             // set new postition to move number
             b.setAtPos(++move, x, y);
-            // System.out.println(b.toString());
         }
         // check to see if program reached the correct solution
         boolean success = true;
@@ -130,11 +137,15 @@ public class knightsTour {
                 }
             }
         }
-        // boards over size 31 usually don't have print super well within the users terminal
+        // boards over size 31 usually don't print super well within the users terminal
         if (SIZE < 32) {
             System.out.println(b.toString());
         }
-        // TODO: print array list of path
+        StringBuilder sb = new StringBuilder();
+        for (int[] p : path) {
+            sb.append("[" + p[0] + ", " + p[1] + "], ");
+        }
+        System.out.println(sb.toString());
         return success;
     }
 
@@ -175,7 +186,7 @@ public class knightsTour {
         for (int[] m: moves) {
             Integer degree = calculateDegree(b, m[0], m[1]);
             map.put(m, degree);
-            log.debug("Degree of [" + m[0] + ", " + m[1] + "]: " + degree);
+            // log.debug("Degree of [" + m[0] + ", " + m[1] + "]: " + degree);
         }
         Map<int[], Integer> m = sortByValue(map);
         return m;
@@ -208,6 +219,7 @@ public class knightsTour {
         if (in.hasNextInt()){
             res = in.nextInt();
             if (!validate(res)) {
+                System.out.println("Input must be from 0 to size - 1!");
                 in.nextLine();
                 res = getInput(prompt, in);
             }

@@ -5,5 +5,18 @@
     ],
     "java.project.sourcePaths": [
         "./"
-    ]
+    ],
+    "launch": {
+        "configurations": [
+            {
+                "name" : "KnightsTour",
+                "type": "java",
+                "request": "launch",
+                "args":  ["-Xmx4096m"],
+                "mainClass": "lab5.KnightsTour.knightsTour.java",
+                "projectName": "lab5.KnightsTour.knightsTour",
+            },
+        ],
+        "compounds": []
+    }
 }

@@ -12,6 +12,21 @@ public class Board {
         boardInitializer();
     }
 
+    public Board(int s, int[][] init_board) {
+        SIZE = s;
+        try {
+            int test = init_board[SIZE - 1][SIZE - 1];
+        } catch (IndexOutOfBoundsException e) {
+            throw new IllegalArgumentException("Argument size must be SIZE x SIZE!", e);
+        };
+        board = new int[SIZE][SIZE];
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                board[i][j] = init_board[i][j];
+            }
+        }
+    }
+
     private void boardInitializer() {
         board = new int[SIZE][SIZE];
         for (int i = 0; i < SIZE; i++) {
@@ -25,7 +40,7 @@ public class Board {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         Integer longest = Integer.MIN_VALUE;
-        for (int i = 0; i < SIZE; i ++) {
+        for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 Integer temp = String.valueOf(board[i][j]).length();
                 if (temp > longest) {
