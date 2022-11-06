@@ -214,7 +214,7 @@ public class IndexTree {
 
 		// add all the words to the tree
 		try {
-			Scanner in = new Scanner(new File("lab6/shakespeare.txt"));
+			Scanner in = new Scanner(new File("lab7/shakespeare.txt"));
 			int lines = 1;
 			while (in.hasNextLine()) {
 				String line = in.nextLine();

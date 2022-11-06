@@ -62,7 +62,7 @@ public class knightsTour {
     // mention that logging WILL be the slowest part of the algorithm).
     // private static Logger log = LogManager.getLogger();
 
-    public static final Integer SIZE = 8;
+    public static final Integer SIZE = 2048;
     public static final int[] CENTER = {SIZE/2, SIZE/2};
 
     public static void main(String[] args) {
@@ -98,6 +98,7 @@ public class knightsTour {
                 bestMoveOrMoves = chooseMove(movesToDegreeMap);
             } catch (NoNextMoves e) {
                 // TODO: make this return false for testing
+                // this has happened, but it seems to be extremely rare
                 System.err.println("Unable to find a next move. Ask the developer to implement a backtracking algorithm. " +
                 "For now, try a different starting position. Hint: make sure the starting position is coordinates are " +
                 "either both odd or both even.");
@@ -145,7 +146,7 @@ public class knightsTour {
         for (int[] p : path) {
             sb.append("[" + p[0] + ", " + p[1] + "], ");
         }
-        System.out.println(sb.toString());
+        // System.out.println(sb.toString());
         return success;
     }
 
