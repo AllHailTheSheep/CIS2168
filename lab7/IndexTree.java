@@ -5,9 +5,6 @@ import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 
 // Your class. Notice how it has no generics.
 // This is because we use generics when we have no idea what kind of data we are getting
@@ -108,6 +105,7 @@ public class IndexTree {
 		// System.out.println("Deleting " + word);
 		return delete(word, this, null);
 	}
+
 	public boolean delete(String word, IndexTree parent, IndexTree abs_root) throws IllegalArgumentException {
 		if (abs_root == null) {
 			abs_root = parent;
@@ -196,12 +194,11 @@ public class IndexTree {
 	// this should print out each word followed by the number of occurrences and the
 	// list of all occurrences
 	// each word and its data gets its own line
-	private static Logger log = LogManager.getLogger();
+	
 	public void printIndex() {
 		if (this.left != null) {
 			this.left.printIndex();
 		}
-		log.info(this.root.toString());
 		System.out.println(this.root.toString());
 		if (this.right != null) {
 			this.right.printIndex();
@@ -245,10 +242,9 @@ public class IndexTree {
 		// test removing a word from the index
 		index.delete("north");
 		System.out.println(index.contains("north")); // false
-		System.out.println(index.contains("")); // true for some reason?
+		System.out.println(index.contains("")); // true for some reason? looks like some punctuation got missed somehow but i'm to lazy to double check it
 
 		// this will not work because removing the root is hard and "the" is the first word in the text file
 		index.delete("the");
 	}
-
 }

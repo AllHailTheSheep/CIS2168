@@ -32,12 +32,16 @@ public class IndexNode  {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Word: " + this.word + "; Occurences: " + this.occurences + "; Lines: ");
-		for (int i = 0; i < list.size(); i++) {
-			if (i != list.size() - 1) {
-				sb.append(list.get(i) + ", ");
-			} else {
-				sb.append(list.get(i));
+		if (this.list.size() < 50) {
+			for (int i = 0; i < list.size(); i++) {
+				if (i != list.size() - 1) {
+					sb.append(list.get(i) + ", ");
+				} else {
+					sb.append(list.get(i));
+				}
 			}
+		} else {
+			sb.append("To many lines to print.");
 		}
 		return sb.toString();
 	}
